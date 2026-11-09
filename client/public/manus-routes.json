@@ -1,1 +1,0 @@
-{"routes":[{"path":"/","title":"Charactera — AI-персонажи"},{"path":"/chat/:id","title":"Диалог с персонажем"},{"path":"/profile","title":"Профиль"}]}
