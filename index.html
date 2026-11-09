@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050505"><title>GIGA — персонажи и чаты</title>
+<style>
+:root{--bg:#050505;--panel:#202020;--panel2:#292929;--blue:#397cff;--blue2:#1458ff;--muted:#999;--white:#f7f7f7}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--white);font-family:Inter,Roboto,"Arial",sans-serif}button,input,textarea,select{font:inherit}button{border:0;color:inherit;cursor:pointer}#app{min-height:100dvh;max-width:520px;margin:auto;position:relative;background:#050505;overflow:hidden}
+.screen{display:none;min-height:100dvh}.screen.active{display:block}.muted{color:var(--muted)}.blue{color:#72a1ff}
+.btn{border-radius:18px;padding:15px 18px;font-weight:700;background:var(--panel2)}.btn.primary{background:var(--blue);color:white}.btn:active,.tile:active{transform:scale(.985)}
+/* onboarding */
+#intro{padding:env(safe-area-inset-top) 22px calc(22px + env(safe-area-inset-bottom));display:none;flex-direction:column;justify-content:flex-end;min-height:100dvh}
+#intro.active{display:flex}.intro-art{height:58vh;min-height:360px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:20px}
+.intro-art img{width:100%;height:100%;object-fit:contain}.intro-copy{text-align:center;min-height:112px}.intro-copy h2{font-size:25px;margin:0 0 12px}.intro-copy p{font-size:18px;line-height:1.35;margin:0 auto;max-width:340px;color:#ddd}
+.dots{display:flex;gap:12px;justify-content:center;margin:24px 0 42px}.dot{width:11px;height:11px;border-radius:50%;background:#303030}.dot.on{background:#fff}
+.auth-actions{display:grid;gap:12px}.google{background:#202020}.google b{font-size:22px;margin-right:10px;background:conic-gradient(#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0);color:transparent;background-clip:text}
+.license{text-align:center;font-size:14px;margin-top:28px;color:#ddd}
+/* app shell */
+#main{padding-bottom:100px}.topbar{padding:calc(12px + env(safe-area-inset-top)) 16px 18px;background:linear-gradient(115deg,#3b5fce,#142a70);border-radius:0 0 30px 30px;display:flex;align-items:center;gap:12px}
+.userpic{width:54px;height:54px;border-radius:50%;object-fit:cover;background:#333}.user-info{flex:1;min-width:0}.user-info strong{display:block;font-size:22px;letter-spacing:.5px}.user-info small{display:block;color:#c1c9e4;margin-top:5px;font-size:15px}
+.balance{background:#ffffff20;border-radius:28px;padding:12px 16px;font-weight:800;font-size:20px;white-space:nowrap}.balance span{font-size:23px;margin-left:5px}
+.content{padding:22px 16px}.search{display:flex;align-items:center;gap:12px;background:#1d1d1f;border-radius:20px;padding:15px 17px;margin:2px 0 35px}.search input{background:transparent;border:0;outline:0;color:white;width:100%;font-size:18px}.search .dice{font-size:25px;color:#7daaff}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 20px}.section-head h2{font-size:28px;margin:0;font-weight:850}.seeall{background:#29292b;border-radius:24px;padding:10px 17px;font-size:17px}
+.feature-row{display:flex;gap:14px;overflow:auto;margin:0 -16px 42px;padding:0 16px;scrollbar-width:none}.feature{flex:0 0 68%;height:240px;border-radius:25px;position:relative;overflow:hidden;background:linear-gradient(140deg,#3511a4,#101d59)}.feature img{width:100%;height:100%;object-fit:cover;opacity:.86}.feature:after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,#000b)}.feature span{position:absolute;z-index:1;bottom:18px;left:16px;right:12px;font-size:20px;font-weight:800;line-height:1.2}
+.people-row{display:flex;gap:18px;overflow:auto;margin:0 -16px 34px;padding:0 16px;scrollbar-width:none}.person{flex:0 0 112px;text-align:center}.person img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #225d85;background:#252525}.person strong{display:block;font-size:16px;margin:8px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rating{font-size:14px;color:#aaa}
+
+
+.list-avatar{width:48px;height:48px;flex:0 0 48px;border-radius:50%;display:inline-grid;place-items:center;overflow:hidden;border:2px solid #315f9a;background:linear-gradient(145deg,#3978d8,#202039);font-size:25px;vertical-align:middle;margin-right:12px}
+.list-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.person-avatar{width:90px;height:90px;flex:0 0 90px;border-radius:50%;display:grid;place-items:center;margin:0 auto;border:3px solid #225d85;background:radial-gradient(circle at 30% 25%,#4b79b8,#171d35 72%);font-size:43px;overflow:hidden}
+.person-avatar img{width:100%;height:100%;border:0;border-radius:50%;object-fit:cover}
+.people-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 10px;margin:4px 0 110px}
+.people-grid .person{min-width:0;width:100%;flex:auto}
+.people-grid .person strong{font-size:14px}
+#topAvatarWrap{width:54px;height:54px;flex:0 0 54px;border-radius:50%;overflow:hidden}
+#topAvatarWrap img{width:100%;height:100%;display:block;object-fit:cover;border-radius:50%;border:2px solid #555}
+.profile-avatar-image{width:112px;height:112px;border-radius:50%;object-fit:cover;border:3px solid #555;display:block;margin:0 auto}
+
+
+.bottom-nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:86px;padding:9px 16px calc(9px + env(safe-area-inset-bottom));background:#252527ed;display:flex;align-items:center;justify-content:space-around;border-top:1px solid #333}
+.navitem{display:flex;flex-direction:column;align-items:center;gap:5px;color:#aaa;background:none;font-size:13px;min-width:76px}.navitem .ico{font-size:25px}.navitem.active{color:white}.create-fab{width:62px;height:62px;border-radius:50%;background:#1266ff;box-shadow:0 0 18px #1266ff;display:grid;place-items:center;font-size:37px;margin-top:-35px;border:3px solid #367eff}
+/* sub pages */
+.subhead{height:62px;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid #222;position:sticky;top:0;background:#080808;z-index:5}.back{background:#242424;width:36px;height:36px;border-radius:50%;font-size:20px}.subhead strong{flex:1;text-align:center;margin-right:38px}
+.pagepad{padding:18px 16px 110px}.field{display:block;background:#202020;border-radius:13px;padding:12px 13px;margin:12px 0}.field label{display:block;color:#aaa;font-size:12px;margin-bottom:6px}.field input,.field textarea,.field select{background:transparent;color:white;border:0;outline:0;width:100%;resize:vertical}.field textarea{min-height:90px}.field select option{background:#222}
+.switchrow{display:flex;align-items:center;justify-content:space-between;background:#202020;border-radius:14px;padding:15px;margin:12px 0}.switchrow input{accent-color:#367cff;width:22px;height:22px}
+.chatpage{height:100dvh;display:flex;flex-direction:column}.chatbody{flex:1;overflow:auto;padding:18px 14px 10px}.bubble{max-width:86%;padding:13px 14px;border-radius:16px;margin:10px 0;line-height:1.35;font-size:15px;white-space:pre-wrap}.bubble.bot{background:#202124;border-bottom-left-radius:5px}.bubble.me{background:linear-gradient(110deg,#3c20d5,#1359ff);margin-left:auto;border-bottom-right-radius:5px}.chatinput{display:flex;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:#111}.chatinput input{flex:1;min-width:0;background:#202020;border:0;border-radius:22px;padding:14px;color:white;outline:0}.send{width:48px;border-radius:50%;background:#347aff;font-size:20px}
+.profile-card{text-align:center;padding:24px 0}.profile-card img{width:100px;height:100px;border-radius:50%;object-fit:cover}.profile-card h2{margin:10px 0 4px}.stats{display:flex;justify-content:center;gap:35px;margin:22px}.stats b{display:block;font-size:21px}.menurow{padding:17px;background:#202020;border-radius:14px;margin:9px 0;display:flex;justify-content:space-between}
+.shopgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.shopitem{background:#202024;border-radius:16px;padding:10px;text-align:center}.shopitem .gem{font-size:45px}.shopitem button{background:#3b78ff;border-radius:12px;padding:9px 12px;margin-top:8px;width:100%}
+.toast{position:fixed;z-index:99;bottom:100px;left:50%;transform:translateX(-50%);background:#333;padding:12px 18px;border-radius:14px;display:none;max-width:90%;text-align:center}
+.modal{position:fixed;inset:0;background:#000b;z-index:50;display:none;align-items:flex-end;justify-content:center}.modal.show{display:flex}.sheet{width:min(520px,100%);background:#1d1d1f;border-radius:24px 24px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom))}.sheet h3{margin:0 0 18px}.sheet .btn{width:100%;margin-top:10px}
+
+.avatar-empty{display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#454545,#171717);color:#eee;border:2px solid #555}
+.avatar-empty.large{width:104px;height:104px;font-size:48px}.avatar-empty.small{width:54px;height:54px;font-size:25px}
+.avatar-upload{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#242426;border:1px solid #444;border-radius:14px;padding:11px 15px;margin-top:12px;font-size:14px}.avatar-upload input{display:none}
+.char-preview{width:104px;height:104px;border-radius:50%;background:#242426;border:2px solid #444;object-fit:cover;display:block;margin:0 auto 10px}
+.bonus-overlay{position:fixed;inset:0;z-index:80;background:#000d;display:none;align-items:flex-end;justify-content:center;padding:0 20px calc(24px + env(safe-area-inset-bottom))}.bonus-overlay.show{display:flex}
+.bonus-card{width:min(520px,100%);text-align:center;padding:0 0 8px;position:relative}
+.bonus-art{height:min(48vh,390px);min-height:260px;display:grid;place-items:center;position:relative;overflow:hidden}
+.bonus-art:before{content:"";position:absolute;width:270px;height:270px;border-radius:50%;background:radial-gradient(circle,#287bffbb 0,#6d22ff88 38%,transparent 72%);filter:blur(20px);animation:bonusPulse 1.8s ease-in-out infinite}
+.bonus-rays{position:absolute;width:260px;height:260px;border-radius:50%;background:repeating-conic-gradient(from 0deg,transparent 0deg 12deg,#6e64ff88 13deg 17deg,transparent 18deg 30deg);mask-image:radial-gradient(circle,transparent 0 22%,#000 45%,transparent 72%);animation:spin 18s linear infinite}
+.bonus-number{position:relative;z-index:2;display:flex;align-items:center;gap:8px;font-size:clamp(58px,15vw,92px);font-weight:900;text-shadow:0 0 24px #387bff}.bonus-number img{width:clamp(70px,19vw,112px);filter:drop-shadow(0 0 18px #7a65ff)}
+.bonus-card h2{font-size:29px;margin:10px 0 12px}.bonus-card p{font-size:17px;color:#eee;margin:0 0 30px}.bonus-card .btn{width:100%;border-radius:28px;font-size:18px;padding:17px}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes bonusPulse{50%{transform:scale(1.14);opacity:.75}}
+\n@media(min-width:600px){body{background:#151515;padding:20px 0}#app{border-radius:25px;min-height:calc(100dvh - 40px)}.bottom-nav{bottom:20px;border-radius:0 0 25px 25px}}
+</style></head>
+<body><div id="app">
+<section id="intro" class="screen active">
+ <div class="intro-art"><img id="introImg" src="assets/onboarding-1.jpg"></div>
+ <div class="intro-copy"><h2 id="introTitle">Миллионы персонажей</h2><p id="introText">Психолог, киноманка, помощник в учёбе и множество других</p></div>
+ <div class="dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div>
+ <div class="auth-actions"><button class="btn primary" onclick="openPhone()">Войти по номеру телефона</button><button class="btn google" onclick="googleLogin()"><b>G</b> Войти с Google</button></div>
+ <div class="license" onclick="toast('Лицензионное соглашение будет подключено на сервере')">Лицензионное соглашение</div>
+</section>
+<section id="main" class="screen">
+ <header class="topbar"><div id="topAvatarWrap"><div class="avatar-empty small">?</div></div><div class="user-info" onclick="showPage('profile')"><strong id="topName">Пользователь</strong><small>Перейти в профиль</small></div><button class="balance" onclick="showPage('shop')"><span id="balance">0</span> 💎</button></header>
+ <div class="content" id="homeContent">
+  <div class="search"><span>⌕</span><input id="searchInput" placeholder="Найти персонажа" oninput="filterPeople(this.value)"><button class="dice" onclick="randomPerson()">⚄</button></div>
+  <div class="section-head"><h2>Актуальное</h2><button class="seeall" onclick="showPage('all')">Все ›</button></div>
+  <div class="feature-row">
+   <div class="feature" onclick="openCharacter('Котёнок')"><img src="assets/onboarding-1.jpg"><span>💔 Время прощаться</span></div>
+   <div class="feature" onclick="showPage('shop')"><img src="assets/onboarding-2.jpg"><span>Стильности<br>и приятности</span></div>
+  </div>
+  <div class="section-head"><h2>Персонажи</h2><button class="seeall" onclick="showPage('all')">Все ›</button></div>
+  <div class="people-row" id="peopleRow"></div>
+  <div class="section-head"><h2>Другие персонажи</h2><button class="seeall" onclick="showPage('all')">Все ›</button></div>
+  <div class="people-grid" id="morePeople"></div>
+ </div>
+ <div id="subPage" style="display:none"></div>
+ <nav class="bottom-nav"><button class="navitem active" onclick="nav('home',this)"><span class="ico">⌂</span>Главная</button><button class="navitem" onclick="nav('create',this)"><span class="create-fab">＋</span>Создать персонажа</button><button class="navitem" onclick="nav('chats',this)"><span class="ico">▢</span>Чаты</button></nav>
+</section>
+<div class="modal" id="phoneModal"><div class="sheet"><h3>Вход по номеру телефона</h3><p class="muted">Введите номер телефона, чтобы получить код подтверждения.</p><div class="field"><label>Номер телефона</label><input id="phone" type="tel" placeholder="+49 000 0000000"></div><button class="btn primary" onclick="sendCode()">Продолжить</button><button class="btn" onclick="closePhone()">Отмена</button></div></div>
+<div class="modal" id="codeModal"><div class="sheet"><h3>Подтверждение номера</h3><p class="muted">Демо-режим: реальная SMS-отправка требует серверного SMS-провайдера.</p><div class="field"><label>Код подтверждения</label><input id="code" inputmode="numeric" maxlength="6" placeholder="123456"></div><button class="btn primary" onclick="verifyCode()">Подтвердить</button><button class="btn" onclick="closeCode()">Назад</button></div></div>
+<div class="bonus-overlay" id="bonusOverlay"><div class="bonus-card"><div class="bonus-art"><div class="bonus-rays"></div><div class="bonus-number">+50 <img src="assets/gem.webp" alt="кристалл"></div></div><h2>Ежедневный бонус</h2><p>Заходи каждый день и получай алмазы</p><button class="btn primary" onclick="closeBonus()">Продолжить</button></div></div><div class="toast" id="toast"></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const slides=[
+ ['assets/onboarding-1.jpg','Миллионы персонажей','Психолог, киноманка, помощник в учёбе и множество других'],
+ ['assets/onboarding-2.jpg','Создавай любых персонажей','Настраивай их характер и стиль общения под себя'],
+ ['assets/onboarding-3.jpg','Используй для разных целей','Отыгрывай сюжеты, учись, твори — персонажи помогут и подскажут']
+];
+let slide=0, balance=Number(localStorage.getItem('giga_balance')||0), currentCharacter=null, chats=JSON.parse(localStorage.getItem('giga_chats')||'{}');
+let userAvatar=localStorage.getItem('giga_user_avatar')||'', customPeople=JSON.parse(localStorage.getItem('giga_custom_people')||'[]'), characterAvatarData='';
+let people=[
+ {name:'Профессор',rating:'4.5',emoji:'👨🏻‍🏫',desc:'Поможет разобраться в сложных темах и объяснит простыми словами.'},
+ {name:'Психолог',rating:'4.3',emoji:'👩🏻‍⚕️',desc:'Выслушает и поможет спокойно разложить мысли по полочкам.'},
+ {name:'Паштет',rating:'4.6',emoji:'🐱',desc:'Ворчливый кот с добрым сердцем и острым языком.'},
+ {name:'Киноман',rating:'4.8',emoji:'🎬',desc:'Подберёт фильм под настроение.'},
+ {name:'Барби',rating:'4.9',emoji:'👱🏻‍♀️',desc:'Общительная и позитивная собеседница.'},
+ {name:'Фродо Бэггинс',rating:'4.8',emoji:'🧙🏻',desc:'Путешественник из далёкого мира.'}
+];
+people=[...customPeople,...people];
+function toast(t){let el=$('toast');el.textContent=t;el.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>el.style.display='none',2600)}
+function renderSlide(){ $('introImg').src=slides[slide][0];$('introTitle').textContent=slides[slide][1];$('introText').textContent=slides[slide][2];document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===slide));}
+let sx=0;$('intro').addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});$('intro').addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>55){slide=(slide+(dx<0?1:2))%3;renderSlide()}},{passive:true});
+document.querySelectorAll('.dot').forEach((d,i)=>d.onclick=()=>{slide=i;renderSlide()});
+function enter(){
+ $('intro').classList.remove('active');$('main').classList.add('active');renderPeople();renderUserAvatar();
+ const today=new Date().toLocaleDateString('en-CA');
+ if(localStorage.getItem('giga_last_daily_bonus')!==today){
+  balance=Number(localStorage.getItem('giga_balance')||0)+50;
+  localStorage.setItem('giga_balance',String(balance));localStorage.setItem('giga_last_daily_bonus',today);
+  updateBalance();$('bonusOverlay').classList.add('show');
+ }
+}
+function updateBalance(){$('balance').textContent=String(balance)}
+function closeBonus(){$('bonusOverlay').classList.remove('show')}
+function renderUserAvatar(){const w=$('topAvatarWrap');if(w)w.innerHTML=`<img class="userpic" src="${userAvatar||'assets/user-avatar-default.webp'}" alt="Аватар пользователя">`}
+function chooseUserAvatar(input){const f=input.files&&input.files[0];if(!f)return;if(!f.type.startsWith('image/'))return toast('Выбери изображение');const r=new FileReader();r.onload=()=>{userAvatar=r.result;localStorage.setItem('giga_user_avatar',userAvatar);renderUserAvatar();const pv=$('profileAvatar');if(pv)pv.innerHTML=`<img src="${userAvatar}" class="profile-avatar-image">`};r.readAsDataURL(f)}
+function previewCharacterAvatar(input){const f=input.files&&input.files[0];if(!f)return;if(!f.type.startsWith('image/'))return toast('Выбери изображение');const r=new FileReader();r.onload=()=>{characterAvatarData=r.result;$('charAvatarPreview').src=characterAvatarData;$('charAvatarPreview').style.display='block';$('charAvatarBlank').style.display='none'};r.readAsDataURL(f)}
+
+function openPhone(){$('phoneModal').classList.add('show')}
+function closePhone(){$('phoneModal').classList.remove('show')}
+function closeCode(){$('codeModal').classList.remove('show')}
+function sendCode(){let p=$('phone').value.trim();if(p.length<7)return toast('Проверьте номер телефона');closePhone();$('codeModal').classList.add('show')}
+function verifyCode(){if($('code').value.trim().length<4)return toast('Введите код');closeCode();enter();toast('Демо-вход выполнен. Подключите SMS API для настоящей авторизации.')}
+function googleLogin(){enter();toast('Демо-режим Google. Для настоящего входа настройте Google OAuth на сервере.')}
+function avatarMarkup(p,i){return p.avatar?`<div class="person-avatar"><img src="${p.avatar}" alt="${p.name}"></div>`:`<div class="person-avatar" style="background:linear-gradient(145deg,hsl(${(i*57+205)%360} 70% 42%),#15151c)">${p.emoji||'👤'}</div>`}
+function personCard(p,i){return `<button class="person" onclick="openCharacter('${p.name.replace(/'/g,"\'")}')">${avatarMarkup(p,i)}<strong>${p.name}</strong><div class="rating">☆ ${p.rating||'5.0'}</div></button>`}
+function renderPeople(list=people){$('peopleRow').innerHTML=list.map(personCard).join('');const more=$('morePeople');if(more)more.innerHTML=people.slice(0,9).map(personCard).join('')}
+function filterPeople(q){renderPeople(people.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())))}
+function filterPeople(q){renderPeople(people.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())))}
+function randomPerson(){let p=people[Math.floor(Math.random()*people.length)];openCharacter(p.name)}
+function showPage(name){$('homeContent').style.display='none';$('subPage').style.display='block';$('subPage').innerHTML=pageHTML(name);document.querySelector('.bottom-nav').style.display=['profile','shop','all','character'].includes(name)?'none':'flex'}
+function backHome(){ $('subPage').style.display='none';$('homeContent').style.display='block';document.querySelector('.bottom-nav').style.display='flex'}
+function nav(which,el){document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));el.classList.add('active');if(which==='home')backHome();else if(which==='create')showPage('create');else showPage('chats')}
+
+function pageHTML(name){
+ if(name==='create')return `<div class="subhead"><button class="back" onclick="backHome()">‹</button><strong>Создание персонажа</strong><button class="back" onclick="saveCharacter()">✓</button></div><div class="pagepad"><div style="text-align:center;padding:12px"><img id="charAvatarPreview" class="char-preview" style="display:none"><div id="charAvatarBlank" class="avatar-empty large" style="margin:0 auto">?</div><label class="avatar-upload">＋ Выбрать аватар персонажа<input type="file" id="charAvatarFile" accept="image/*" onchange="previewCharacterAvatar(this)"></label></div><div class="field"><label>Имя</label><input id="cName" placeholder="Например, Шрек"></div><div class="field"><label>Тип персонажа</label><input id="cType" placeholder="Дружелюбный собеседник"></div><div class="field"><label>Пол</label><select id="cGender"><option>Не указан</option><option>Мужской</option><option>Женский</option></select></div><div class="switchrow"><div><b>Умеет рисовать</b><div class="muted" style="font-size:12px">Генерация изображений по запросу</div></div><input type="checkbox" id="cDraw"></div><div class="field"><label>Характер и поведение</label><textarea id="cDesc" placeholder="Опиши характер, стиль общения и историю персонажа..."></textarea></div><button class="btn primary" style="width:100%" onclick="saveCharacter()">Создать персонажа</button></div>`;
+ if(name==='chats')return `<div class="subhead"><button class="back" onclick="backHome()">‹</button><strong>Чаты</strong></div><div class="pagepad" id="chatList">${Object.keys(chats).length?Object.keys(chats).map(n=>`<button class="menurow" style="width:100%;color:white" onclick="openCharacter('${n}')">💬 ${n}<span>›</span></button>`).join(''):'<p class="muted" style="text-align:center;margin-top:70px">Здесь будут ваши диалоги с персонажами</p>'}</div>`;
+ if(name==='profile')return `<div class="subhead"><button class="back" onclick="backHome()">‹</button><strong>Профиль</strong></div><div class="pagepad"><div class="profile-card"><div id="profileAvatar">${userAvatar?`<img src="${userAvatar}" class="char-preview">`:'<img src="assets/user-avatar-default.webp" class="profile-avatar-image" alt="Аватар пользователя">'}</div><label class="avatar-upload">＋ Выбрать свою аватарку<input type="file" accept="image/*" onchange="chooseUserAvatar(this)"></label><h2 id="profileName">Пользователь</h2><div class="muted">Мой профиль</div></div><div class="stats"><div><b>${people.length}</b><small>Персонажей</small></div><div><b>0</b><small>Подписчиков</small></div><div><b>1</b><small>Подписки</small></div></div><button class="menurow" style="width:100%;color:white" onclick="editName()">✎ Изменить профиль <span>›</span></button><button class="menurow" style="width:100%;color:white" onclick="showPage('shop')">💎 Пополнить баланс <span>›</span></button><button class="menurow" style="width:100%;color:white" onclick="toast('Настройки')">⚙ Настройки <span>›</span></button></div>`;
+ if(name==='shop')return `<div class="subhead"><button class="back" onclick="backHome()">‹</button><strong>Магазин кристаллов</strong></div><div class="pagepad"><p class="muted">Баланс: <b>${balance} 💎</b></p><div class="shopgrid">${[200,500,1000,2500,5000,10000].map((n,i)=>`<div class="shopitem"><div class="gem">💎</div><b>${n} кристаллов</b><button onclick="buy(${n})">Получить · ${[99,199,349,699,1299,2299][i]} ₽</button></div>`).join('')}</div><p class="muted" style="font-size:12px;margin-top:20px">Демонстрационный магазин. Реальные платежи и покупки требуют серверной платёжной интеграции.</p></div>`;
+ if(name==='all')return `<div class="subhead"><button class="back" onclick="backHome()">‹</button><strong>Персонажи</strong></div><div class="pagepad"><div class="search"><span>⌕</span><input placeholder="Найти персонажа" oninput="document.getElementById('allPeople').innerHTML=allPeopleHTML(this.value)"></div><div id="allPeople">${allPeopleHTML('')}</div></div>`;
+ if(name==='character')return '';
+ return '';
+}
+function allPeopleHTML(q){return people.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())).map((p,i)=>`<button class="menurow" style="width:100%;color:white;text-align:left;align-items:center" onclick="openCharacter('${p.name.replace(/'/g,"\\\\'")}')"><span style="display:flex;align-items:center;min-width:0"><span class="list-avatar">${p.avatar?`<img src="${p.avatar}" alt="">`:(p.emoji||'👤')}</span><span>${p.name}<small class="muted" style="display:block;margin-top:5px">${p.desc||'Персонаж'}</small></span></span><span>☆ ${p.rating||'5.0'}</span></button>`).join('')}
+function saveCharacter(){let n=$('cName')?.value.trim();if(!n)return toast('Укажи имя персонажа');let d=$('cDesc')?.value.trim()||'Новый персонаж';let item={name:n,rating:'5.0',emoji:'✨',desc:d,avatar:characterAvatarData};customPeople.unshift(item);people.unshift(item);localStorage.setItem('giga_custom_people',JSON.stringify(customPeople));characterAvatarData='';renderPeople();backHome();toast('Персонаж «'+n+'» создан')}
+function openCharacter(n){currentCharacter=n;let p=people.find(x=>x.name===n)||{name:n,desc:'Новый персонаж'};showPage('character');$('subPage').innerHTML=`<div class="chatpage"><div class="subhead"><button class="back" onclick="backHome()">‹</button><strong>${n}</strong><button class="back" onclick="toast('Меню персонажа')">⋮</button></div><div class="chatbody" id="messages">${(chats[n]||[{from:'bot',text:'Привет! Рад знакомству 😊 О чём поговорим?'}]).map(m=>`<div class="bubble ${m.from==='me'?'me':'bot'}">${escapeHtml(m.text)}</div>`).join('')}</div><div class="chatinput"><input id="messageInput" placeholder="Напиши сообщение..." onkeydown="if(event.key==='Enter')sendMessage()"><button class="send" onclick="sendMessage()">➤</button></div></div>`;document.querySelector('.bottom-nav').style.display='none';$('messages').scrollTop=$('messages').scrollHeight}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function sendMessage(){let input=$('messageInput'),v=input.value.trim();if(!v)return;chats[currentCharacter]=chats[currentCharacter]||[{from:'bot',text:'Привет! Рад знакомству 😊 О чём поговорим?'}];chats[currentCharacter].push({from:'me',text:v});$('messages').innerHTML+=`<div class="bubble me">${escapeHtml(v)}</div>`;input.value='';let wait=document.createElement('div');wait.className='bubble bot';wait.textContent='…';$('messages').appendChild(wait);$('messages').scrollTop=$('messages').scrollHeight;setTimeout(()=>{wait.textContent='Я получил твоё сообщение! Чтобы получать ответы настоящей ИИ-модели, подключи API на сервере.';chats[currentCharacter].push({from:'bot',text:wait.textContent});localStorage.setItem('giga_chats',JSON.stringify(chats));$('messages').scrollTop=$('messages').scrollHeight},650)}
+function buy(n){toast('Покупка '+n+' 💎 доступна после подключения платежей')}
+function editName(){let n=prompt('Как тебя называть?');if(n){$('topName').textContent=n;$('profileName').textContent=n;localStorage.setItem('giga_name',n)}}
+let saved=localStorage.getItem('giga_name');if(saved){$('topName').textContent=saved}updateBalance();renderUserAvatar();
+</script></body></html>
